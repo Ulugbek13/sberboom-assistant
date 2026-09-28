@@ -53,7 +53,7 @@ def ask_gemini(user_text):
         "max_tokens": 300
     }
     try:
-        r = requests.post(GEMINI_URL, headers=headers, json=body, timeout=8)
+        r = requests.post(GEMINI_URL, headers=headers, json=body, timeout=5)
         r.raise_for_status()
         return r.json()["choices"][0]["message"]["content"]
     except Exception:
