@@ -40,31 +40,38 @@ def webhook():
     return jsonify(response)
 
 
+MODELS = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.1-flash-lite"]
+
+
 def ask_gemini(user_text):
     headers = {
         "Authorization": f"Bearer {GEMINI_API_KEY}",
         "Content-Type": "application/json"
     }
-    body = {
-        "model": "gemini-3.5-flash-lite",
-        "messages": [
-            {"role": "system", "content": "Ты голосовой ассистент. Отвечай по-русски, очень кратко: одним-двумя предложениями, без markdown и списков."},
-            {"role": "user", "content": user_text}
-        ],
-        "max_tokens": 150
-    }
     start = time.time()
-    r = None
-    try:
-        r = requests.post(GEMINI_URL, headers=headers, json=body, timeout=20)
-        print("GEMINI OK in", round(time.time() - start, 2), "s")
-        r.raise_for_status()
-        return r.json()["choices"][0]["message"]["content"]
-    except Exception as e:
-        print("GEMINI ERROR after", round(time.time() - start, 2), "s:", repr(e))
-        if r is not None:
-            print("GEMINI RESPONSE:", r.text)
-        return "Извини, не получилось спросить нейросеть."
+    for model in MODELS:
+        left = 5.5 - (time.time() - start)
+        if left < 1:
+            break
+        body = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": "Ты голосовой ассистент. Отвечай по-русски, очень кратко: одним-двумя предложениями, без markdown и списков."},
+                {"role": "user", "content": user_text}
+            ],
+            "max_tokens": 200
+        }
+        r = None
+        try:
+            r = requests.post(GEMINI_URL, headers=headers, json=body, timeout=min(left, 3.5))
+            r.raise_for_status()
+            print("GEMINI OK", model, round(time.time() - start, 2), "s")
+            return r.json()["choices"][0]["message"]["content"]
+        except Exception as e:
+            print("GEMINI ERROR", model, round(time.time() - start, 2), "s:", repr(e))
+            if r is not None:
+                print("GEMINI RESPONSE:", r.text[:300])
+    return "Извини, сейчас нейросеть перегружена. Повтори вопрос чуть позже."
 
 
 if __name__ == "__main__":
