@@ -52,13 +52,15 @@ def ask_gemini(user_text):
         ],
         "max_tokens": 150
     }
+    start = time.time()
     r = None
     try:
-        r = requests.post(GEMINI_URL, headers=headers, json=body, timeout=6)
+        r = requests.post(GEMINI_URL, headers=headers, json=body, timeout=20)
+        print("GEMINI OK in", round(time.time() - start, 2), "s")
         r.raise_for_status()
         return r.json()["choices"][0]["message"]["content"]
     except Exception as e:
-        print("GEMINI ERROR:", repr(e))
+        print("GEMINI ERROR after", round(time.time() - start, 2), "s:", repr(e))
         if r is not None:
             print("GEMINI RESPONSE:", r.text)
         return "Извини, не получилось спросить нейросеть."
