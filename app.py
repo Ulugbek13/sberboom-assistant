@@ -47,15 +47,14 @@ def ask_gemini(user_text):
     body = {
         "model": "gemini-3.5-flash-lite",
         "messages": [
-            {"role": "system", "content": "Ты дружелюбный голосовой ассистент. Отвечай кратко, по-русски, без markdown."},
+            {"role": "system", "content": "Ты голосовой ассистент. Отвечай по-русски, очень кратко: одним-двумя предложениями, без markdown и списков."},
             {"role": "user", "content": user_text}
         ],
-        "max_tokens": 300
+        "max_tokens": 150
     }
-    print("KEY SET:", bool(GEMINI_API_KEY))
     r = None
     try:
-        r = requests.post(GEMINI_URL, headers=headers, json=body, timeout=5)
+        r = requests.post(GEMINI_URL, headers=headers, json=body, timeout=6)
         r.raise_for_status()
         return r.json()["choices"][0]["message"]["content"]
     except Exception as e:
