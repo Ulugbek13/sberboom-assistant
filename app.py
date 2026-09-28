@@ -45,7 +45,7 @@ def ask_gemini(user_text):
         "Content-Type": "application/json"
     }
     body = {
-        "model": "gemini-2.5-flash",
+        "model": "gemini-3.5-flash-lite",
         "messages": [
             {"role": "system", "content": "Ты дружелюбный голосовой ассистент. Отвечай кратко, по-русски, без markdown."},
             {"role": "user", "content": user_text}
